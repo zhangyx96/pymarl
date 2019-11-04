@@ -4,7 +4,7 @@ import pprint
 import time
 import threading
 import torch as th
-from types import SimpleNamespace as SN
+from types import SimpleNamespace
 from utils.logging import Logger
 from utils.timehelper import time_left, time_str
 from os.path import dirname, abspath
@@ -21,8 +21,9 @@ def run(_run, _config, _log):
     # check args sanity
     _config = args_sanity_check(_config, _log)
 
-    args = SN(**_config)
-    args.device = "cuda" if args.use_cuda else "cpu"
+    #TODO why use SimpleNamespace 
+    args = SimpleNamespace(**_config)
+    args.device = "cuda:1" if args.use_cuda else "cpu"
 
     # setup loggers
     logger = Logger(_log)
