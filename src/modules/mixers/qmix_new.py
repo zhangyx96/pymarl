@@ -10,7 +10,7 @@ class QMixer_new(nn.Module):
 
         self.args = args
         self.n_agents = args.n_agents
-        self.state_dim = int(np.prod(args.state_shape))
+        self.state_dim = int(np.prod(args.state_shape)) #120
 
         self.embed_dim = args.mixing_embed_dim  #32
 
@@ -25,11 +25,10 @@ class QMixer_new(nn.Module):
                                nn.ReLU(),
                                nn.Linear(self.embed_dim, 1))
 
-    def forward(self, agent_qs, states):
+    def forward(self, agent_qs, states, actions):
         bs = agent_qs.size(0)
         states = states.reshape(-1, self.state_dim)
         agent_qs = agent_qs.view(-1, 1, self.n_agents)
-        print('++++++++++++++++++',agent_qs.shape())
         # First layer
         w1 = th.abs(self.hyper_w_1(states))
         b1 = self.hyper_b_1(states)

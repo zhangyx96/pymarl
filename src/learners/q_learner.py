@@ -2,6 +2,7 @@ import copy
 from components.episode_buffer import EpisodeBatch
 from modules.mixers.vdn import VDNMixer
 from modules.mixers.qmix import QMixer
+from modules.mixers.qmix_new import QMixer_new
 import torch as th
 from torch.optim import RMSprop
 
@@ -21,7 +22,7 @@ class QLearner:
             if args.mixer == "vdn":
                 self.mixer = VDNMixer()
             elif args.mixer == "qmix":
-                self.mixer = QMixer(args)
+                self.mixer = QMixer_new(args)
             else:
                 raise ValueError("Mixer {} not recognised.".format(args.mixer))
             self.params += list(self.mixer.parameters())
@@ -79,8 +80,12 @@ class QLearner:
 
         # Mix
         if self.mixer is not None:
-            chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
-            target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
+            # chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
+            # target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
+            #print(batch["state"][:, :-1].size())
+            chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1],batch["action"][:, :-1].size())
+            target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:],batch["action"][:, :-1].size())
+
 
         # Calculate 1-step Q-Learning targets
         targets = rewards + self.args.gamma * (1 - terminated) * target_max_qvals
