@@ -22,7 +22,9 @@ class QLearner:
             if args.mixer == "vdn":
                 self.mixer = VDNMixer()
             elif args.mixer == "qmix":
-                self.mixer = QMixer_new(args)
+                self.mixer = QMixer(args)
+            elif args.mixer == "qmix_new":
+                self.mixer = QMixer_new(args)            
             else:
                 raise ValueError("Mixer {} not recognised.".format(args.mixer))
             self.params += list(self.mixer.parameters())
@@ -83,8 +85,8 @@ class QLearner:
             # chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
             # target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
             #print(batch["state"][:, :-1].size())
-            chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1],batch["action"][:, :-1].size())
-            target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:],batch["action"][:, :-1].size())
+            chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1],batch["actions"][:, :-1])
+            target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:],batch["actions"][:, :-1])
 
 
         # Calculate 1-step Q-Learning targets
