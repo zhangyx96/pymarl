@@ -23,7 +23,7 @@ def run(_run, _config, _log):
 
     #TODO why use SimpleNamespace 
     args = SimpleNamespace(**_config)
-    args.device = "cuda:1" if args.use_cuda else "cpu"
+    args.device = "cuda" if args.use_cuda else "cpu"
 
     # setup loggers
     logger = Logger(_log)
