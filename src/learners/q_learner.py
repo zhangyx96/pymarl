@@ -82,13 +82,15 @@ class QLearner:
 
         # Mix
         if self.mixer is not None:
-            # chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
-            # target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
-            #print(batch["state"][:, :-1].size())
-            chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1],batch["actions"][:, :-1])
-            target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:],batch["actions"][:, :-1])
-
-
+            #print(batch["actions_onehot"].size())
+            if self.args.mixer == "qmix_new":
+                chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1],batch["actions_onehot"][:, :-1])
+                target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:],batch["actions_onehot"][:, :-1])
+            else:
+                chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
+                target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
+            
+            
         # Calculate 1-step Q-Learning targets
         targets = rewards + self.args.gamma * (1 - terminated) * target_max_qvals
 
