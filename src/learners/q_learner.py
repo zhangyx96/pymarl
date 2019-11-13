@@ -2,7 +2,7 @@ import copy
 from components.episode_buffer import EpisodeBatch
 from modules.mixers.vdn import VDNMixer
 from modules.mixers.qmix import QMixer
-from modules.mixers.qmix_new import QMixer_new
+from modules.mixers.qmix_new import Load_MyQmix
 import torch as th
 from torch.optim import RMSprop
 
@@ -24,7 +24,7 @@ class QLearner:
             elif args.mixer == "qmix":
                 self.mixer = QMixer(args)
             elif args.mixer == "qmix_new":
-                self.mixer = QMixer_new(args)            
+                self.mixer = Load_MyQmix(args)            
             else:
                 raise ValueError("Mixer {} not recognised.".format(args.mixer))
             self.params += list(self.mixer.parameters())

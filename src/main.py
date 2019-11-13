@@ -31,12 +31,13 @@ def my_main(_run, _config, _log):
     np.random.seed(config["seed"])
     th.manual_seed(config["seed"])
     config['env_args']['seed'] = config["seed"]
-
+    print(config['exp'])
     # run the framework
     run(_run, config, _log)
 
 
 def _get_config(params, arg_name, subfolder):
+    print(params)
     config_name = None
     for _i, _v in enumerate(params):
         if _v.split("=")[0] == arg_name:
@@ -84,10 +85,10 @@ if __name__ == '__main__':
     # Load algorithm and env base configs
     env_config = _get_config(params, "--env-config", "envs")
     alg_config = _get_config(params, "--config", "algs")
+
     # config_dict = {**config_dict, **env_config, **alg_config}
     config_dict = recursive_dict_update(config_dict, env_config)
     config_dict = recursive_dict_update(config_dict, alg_config)
-
     # now add all the config to sacred
     ex.add_config(config_dict)
 
