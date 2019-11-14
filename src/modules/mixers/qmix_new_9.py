@@ -14,17 +14,15 @@ class QMixer_new(nn.Module):
         self.action_dim = int(args.n_actions*args.n_agents)
 
         self.embed_dim = args.mixing_embed_dim
-        self.embed_dim_2 = args.mixing_embed_dim
 
-        
         self.hyper_w_1 = nn.Linear(self.state_dim, self.n_agents * self.embed_dim)
         self.hyper_b_1 = nn.Linear(self.state_dim, self.embed_dim)
         #add the action layer
-        self.hyper_w_2 = nn.Linear(self.action_dim, self.n_agents * self.embed_dim_2)
-        self.hyper_b_2 = nn.Linear(self.action_dim, self.embed_dim_2)
+        self.hyper_w_2 = nn.Linear(self.action_dim, self.n_agents * self.embed_dim)
+        self.hyper_b_2 = nn.Linear(self.action_dim, self.embed_dim)
 
         #the input layer is the combination of hideen1 and hidden2
-        self.hyper_w_final = nn.Linear(self.state_dim, self.embed_dim + self.embed_dim_2)
+        self.hyper_w_final = nn.Linear(self.state_dim, self.embed_dim)
         # V(s) instead of a bias for the last layers
         self.V = nn.Sequential(nn.Linear(self.state_dim, self.embed_dim),
                                nn.ReLU(),
@@ -49,11 +47,11 @@ class QMixer_new(nn.Module):
         hidden2 = F.elu(th.bmm(agent_qs, w2) + b2)
 
         #cat hidden1 and hidden2
-        hidden = th.cat((hidden1,hidden2),dim=2)
+        hidden = hidden1 + hidden2
 
         # Third layer
         w_final = th.abs(self.hyper_w_final(states))
-        w_final = w_final.view(-1, self.embed_dim + self.embed_dim_2, 1)
+        w_final = w_final.view(-1, self.embed_dim, 1)
         # State-dependent bias
         v = self.V(states).view(-1, 1, 1)
         # Compute final output

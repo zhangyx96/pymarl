@@ -9,19 +9,18 @@ class QMixer_new(nn.Module):
         super(QMixer_new, self).__init__()
 
         self.args = args
+        self.alpha = 0.1
         self.n_agents = args.n_agents
         self.state_dim = int(np.prod(args.state_shape))   
         self.action_dim = int(args.n_actions*args.n_agents)
 
         self.embed_dim = args.mixing_embed_dim
-        self.embed_dim_2 = args.mixing_embed_dim
 
-        
         self.hyper_w_1 = nn.Linear(self.state_dim, self.n_agents * self.embed_dim)
         self.hyper_b_1 = nn.Linear(self.state_dim, self.embed_dim)
         #add the action layer
-        self.hyper_w_2 = nn.Linear(self.action_dim, self.n_agents * self.embed_dim_2)
-        self.hyper_b_2 = nn.Linear(self.action_dim, self.embed_dim_2)
+        self.hyper_w_2 = nn.Linear(self.action_dim, self.n_agents * self.embed_dim)
+        self.hyper_b_2 = nn.Linear(self.action_dim, self.embed_dim)
 
         #the input layer is the combination of hideen1 and hidden2
         self.hyper_w_final = nn.Linear(self.state_dim, self.embed_dim)
@@ -48,8 +47,8 @@ class QMixer_new(nn.Module):
         b2 = b2.view(-1, 1, self.embed_dim)
         hidden2 = F.elu(th.bmm(agent_qs, w2) + b2)
 
-        #cat hidden1 and hidden2
-        hidden = th.sum(hidden1,hidden2)
+        #cat hidden1 and hidden2 
+        hidden = hidden1 + self.alpha * hidden2
 
         # Third layer
         w_final = th.abs(self.hyper_w_final(states))
